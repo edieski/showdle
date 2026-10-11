@@ -16,11 +16,13 @@ export function save(store, storage = globalThis.localStorage) {
 }
 
 // isShow(name) says whether a name is still in the repertoire.
-export function load({ today, dailyTarget, isShow, storage = globalThis.localStorage }) {
+// scheduled: today's show was hand-picked, so it replaces whatever answer was saved for today.
+export function load({ today, dailyTarget, scheduled = false, isShow, storage = globalThis.localStorage }) {
   const store = read(storage);
 
   let daily = store.daily;
   if (!daily || daily.day !== today || !Array.isArray(daily.guesses)) daily = blankGame({ day: today });
+  if (scheduled && daily.target !== dailyTarget) daily = blankGame({ day: today, target: dailyTarget });
   daily.guesses = daily.guesses.filter(isShow);
   // Pin today's answer, so growing the repertoire mid-day never swaps the show under a game in progress.
   if (!isShow(daily.target)) {

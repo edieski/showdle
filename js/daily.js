@@ -6,6 +6,18 @@ export function dayNumber(date = new Date()) {
   return Math.floor(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 864e5);
 }
 
+// Local calendar date as YYYY-MM-DD, the key for scheduled shows.
+export function dateKey(date = new Date()) {
+  const pad = v => String(v).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+// The day's show: a scheduled pick if there is one, otherwise the shuffle.
+export function dailyShow(shows, schedule, date = new Date()) {
+  const picked = shows.find(s => s.name === schedule[dateKey(date)]);
+  return { show: picked || shows[dailyIndex(dayNumber(date), shows.length)], scheduled: !!picked };
+}
+
 // mulberry32
 function rng(seed) {
   let a = seed >>> 0;

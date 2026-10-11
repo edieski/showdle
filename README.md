@@ -36,4 +36,6 @@ single-file version: daily answers, ticket colours, the "Known so far" strip and
 | `js/main.js` | Game controller and page wiring |
 | `css/style.css` | All styles |
 
+To pick the daily show for a date, add it to `SCHEDULE` in `js/data.js`. It replaces any answer already saved for that day.
+
 Adding shows changes the daily order for future cycles; today's answer stays pinned for anyone mid-game.

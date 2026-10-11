@@ -20,3 +20,13 @@ test('no daily show repeats within a cycle', () => {
   const seen = new Set(Array.from({ length: N }, (_, i) => dailyIndex(start + i, N)));
   assert.equal(seen.size, N);
 });
+
+test('scheduled days name real shows and override the shuffle', async () => {
+  const { SCHEDULE } = await import('../js/data.js');
+  const { dailyShow } = await import('../js/daily.js');
+  for (const name of Object.values(SCHEDULE)) assert.ok(SHOWS.some(s => s.name === name), name);
+  const picked = dailyShow(SHOWS, { '2026-10-11': 'El Alma al Aire' }, new Date(2026, 9, 11));
+  assert.equal(picked.show.name, 'El Alma al Aire');
+  assert.equal(picked.scheduled, true);
+  assert.equal(dailyShow(SHOWS, {}, new Date(2026, 9, 12)).scheduled, false);
+});

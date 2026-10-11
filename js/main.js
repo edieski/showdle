@@ -2,7 +2,8 @@
 import { $, el } from './dom.js';
 import { SHOWS, byName } from './shows.js';
 import { shape } from './text.js';
-import { dayNumber, dailyIndex } from './daily.js';
+import { SCHEDULE } from './data.js';
+import { dayNumber, dailyShow } from './daily.js';
 import { matches, exactMatch } from './search.js';
 import { load, save, blankGame, recordWin, recordGiveUp } from './store.js';
 import { headEl, rowEl, knownEl } from './board.js';
@@ -15,9 +16,11 @@ const HINTS = {
 };
 
 const today = dayNumber();
+const daily = dailyShow(SHOWS, SCHEDULE);
 const store = load({
   today,
-  dailyTarget: SHOWS[dailyIndex(today, SHOWS.length)].name,
+  dailyTarget: daily.show.name,
+  scheduled: daily.scheduled,
   isShow: name => byName.has(name),
 });
 

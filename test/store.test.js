@@ -45,3 +45,17 @@ test('streaks', () => {
   assert.equal(st.streak, 0);
   assert.equal(st.best, 2);
 });
+
+test('a scheduled show replaces an answer already saved for today', () => {
+  const storage = memory();
+  const s = load(opts(storage));
+  s.daily.guesses.push('Cats');
+  save(s, storage);
+  const again = load({ ...opts(storage), dailyTarget: 'Hamilton', scheduled: true });
+  assert.equal(again.daily.target, 'Hamilton');
+  assert.deepEqual(again.daily.guesses, []);
+  // and keeps progress once it is the saved answer
+  again.daily.guesses.push('Cats');
+  save(again, storage);
+  assert.deepEqual(load({ ...opts(storage), dailyTarget: 'Hamilton', scheduled: true }).daily.guesses, ['Cats']);
+});
