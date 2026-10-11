@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Showdle</title>
+  <meta name="description" content="Guess the daily musical. Every guess prints eight ticket clues about the answer.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Archivo:wdth,wght@62..125,100..900&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="top" id="sign">
+    <h1>Showdle</h1>
+    <nav aria-label="Game">
+      <button type="button" class="link" id="help-open">How to play</button>
+      <button type="button" class="link" id="mode-toggle">Practice</button>
+    </nav>
+  </header>
+  <div class="bulbs" id="bulbs" aria-hidden="true"></div>
+
+  <main>
+    <section class="play" aria-label="Play">
+      <p class="prompt" id="prompt">Guess today's musical</p>
+      <form id="guess-form" autocomplete="off">
+        <div class="guess-field">
+          <input id="guess-input" type="text" aria-label="Your guess" placeholder="Type a musical" role="combobox" aria-expanded="false" aria-controls="suggest" aria-autocomplete="list" autocomplete="off" spellcheck="false">
+          <button type="submit" id="guess-btn">Guess</button>
+          <ul id="suggest" role="listbox" hidden></ul>
+        </div>
+        <p class="msg" id="form-msg" role="status"></p>
+      </form>
+      <p class="tip" id="tip">Every guess prints eight clues about the answer.</p>
+      <div class="hints" id="hints" hidden>
+        <button type="button" class="hint" id="hint-song" hidden></button>
+        <button type="button" class="hint" id="hint-shape" hidden></button>
+      </div>
+    </section>
+
+    <section class="end" id="end" hidden aria-live="polite"></section>
+
+    <section class="board-wrap" id="board-wrap" hidden aria-label="Your guesses">
+      <div class="board" id="board" role="table" aria-label="Guesses, newest first"></div>
+      <div class="board-foot">
+        <ul class="legend">
+          <li><span class="swatch ok"></span>Match</li>
+          <li><span class="swatch near"></span>Partly right</li>
+          <li><span class="swatch miss"></span>No match (punched)</li>
+        </ul>
+        <button type="button" class="link" id="giveup">Reveal the answer</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<dialog id="help" aria-labelledby="help-title">
+  <div class="sheet">
+    <div class="sheet-top">
+      <h2 id="help-title">How to play</h2>
+      <button type="button" class="link" id="help-close">Close</button>
+    </div>
+    <p>Guess the mystery musical. Each guess prints a strip of eight tickets that compare its credits with the answer.</p>
+    <ul class="legend">
+      <li><span class="swatch ok"></span>Green: exact match</li>
+      <li><span class="swatch near"></span>Striped yellow: partly right, or within 5 years</li>
+      <li><span class="swatch miss"></span>Plain with a punched hole: no match</li>
+      <li><span class="swatch out"></span>Dashed outlines: not known yet, in the strip that sums up your guesses</li>
+    </ul>
+    <p>Under a wrong year, "try later" or "try earlier" says which way the answer lies.</p>
+    <p>Example: the answer is Hamilton and you guess Dear Evan Hansen.</p>
+    <div class="board compact" id="example" role="table" aria-label="Example guess"></div>
+    <p>Stuck? A song clue unlocks after 4 guesses, and the shape of the title after 7. The daily show is the same for everyone. Practice rounds are unlimited.</p>
+    <dl class="cols">
+      <div><dt>Opened</dt><dd>Year of the first full run in a major theatre city, usually New York or London, Off-Broadway included.</dd></div>
+      <div><dt>Origin</dt><dd>Country where the show was created and first produced.</dd></div>
+      <div><dt>Music by</dt><dd>The composers of the score.</dd></div>
+      <div><dt>Based on</dt><dd>What the story or the songs were adapted from.</dd></div>
+      <div><dt>Setting</dt><dd>Where the story takes place.</dd></div>
+      <div><dt>Era</dt><dd>When the story takes place.</dd></div>
+      <div><dt>Style</dt><dd>The sound of the score.</dd></div>
+      <div><dt>Tony</dt><dd>Whether it won the Tony Award for Best Musical.</dd></div>
+    </dl>
+    <details>
+      <summary id="rep-summary">The repertoire</summary>
+      <ul id="repertoire"></ul>
+    </details>
+  </div>
+</dialog>
+</body>
+</html>

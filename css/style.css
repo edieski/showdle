@@ -1,0 +1,205 @@
+/* One look on purpose: the house curtain, deep red velvet, with gilt fat-face lettering (the type of old playbills)
+   and strips of printed tickets laid on it. No light/dark variants.
+   Layout: everything hangs off the left edge. Title bar, a big prompt, the guess bar, then one ticket strip per guess. */
+
+/* Base: safe areas on notched phones, and make [hidden] win over the display rules below. */
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+body { margin: 0; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+
+:root {
+  color-scheme: dark;
+  --page: #641226;   /* curtain velvet */
+  --fold-dark: rgba(22, 0, 7, 0.24);
+  --fold-light: rgba(255, 210, 196, 0.06);
+  --gold: #f0c35a;   /* gilt lettering */
+  --bulb: #ffe9b8;   /* lit bulb */
+  --ink: #2b0b12;    /* printing ink */
+  --paper: #fff7e6;  /* ivory ticket stock */
+  --on: #fbf1dc;     /* type on the curtain */
+  --on-soft: #ecd2c0;
+  --ok: #24643f;     /* forest velvet: match */
+  --near: #f2c14e;   /* gold stock: partly right */
+  --miss: #e6cfa8;   /* buff stock, punched: no match */
+  --stripe: rgba(43, 11, 18, 0.16);
+  --veil: rgba(24, 2, 8, 0.66);
+  --perf: var(--page); /* colour seen through perforations */
+  --display: 'Abril Fatface', 'Bodoni MT', Didot, Georgia, serif;
+  --text: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+body { background: repeating-linear-gradient(90deg, transparent 0, var(--fold-dark) 40px, var(--fold-light) 66px, transparent 104px), var(--page); color: var(--on); font: 400 16px/1.5 var(--text); }
+.wrap { max-width: 1080px; margin: 0 auto; padding-inline: 16px; padding-block: 16px 72px; display: grid; grid-template-columns: minmax(0, 1fr); }
+/* Spacing scale: 8 inside a strip, 12 for captions, 24 between related blocks, 48 between sections */
+main { display: grid; grid-template-columns: minmax(0, 1fr); gap: 48px; min-width: 0; padding-top: 48px; }
+p { margin: 0; }
+button { font: 600 15px/1.2 var(--text); cursor: pointer; }
+button.link { background: none; border: 0; padding: 6px 0; color: inherit; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+.top { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 4px 18px; }
+.top h1 { font: 400 34px/1 var(--display); letter-spacing: 0.01em; color: var(--gold); margin: 0; }
+.top nav { display: flex; gap: 20px; }
+
+/* Guess bar */
+.play { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; }
+.play:not(:has(> :not([hidden]))) { display: none; }
+.play #guess-form { margin-top: 24px; }
+.play .tip { margin-top: 12px; }
+.play .hints { margin-top: 12px; }
+.prompt { font: 400 clamp(36px, 7.4vw, 66px)/1.04 var(--display); color: var(--gold); text-wrap: balance; }
+#guess-form { width: min(100%, 640px); display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+/* A run of marquee bulbs under the title: they chase slowly, and faster after a win */
+.bulbs { display: flex; justify-content: space-between; align-items: center; height: 14px; margin-top: 20px; }
+.bulbs i { width: 8px; height: 8px; flex: none; border-radius: 50%; background: var(--bulb); box-shadow: 0 0 6px 1px var(--bulb), 0 0 18px 4px color-mix(in srgb, var(--gold) 60%, transparent); animation: chase 2.1s steps(1) infinite; }
+.bulbs i:nth-child(3n+2) { animation-delay: 0.7s; }
+.bulbs i:nth-child(3n) { animation-delay: 1.4s; }
+.win .bulbs i { animation-duration: 0.6s; }
+.win .bulbs i:nth-child(3n+2) { animation-delay: 0.2s; }
+.win .bulbs i:nth-child(3n) { animation-delay: 0.4s; }
+@keyframes chase { 0% { opacity: 1; } 34% { opacity: 0.28; } 100% { opacity: 0.28; } }
+@media (max-width: 520px) { .bulbs i:nth-child(even) { display: none; } }
+
+/* The guess bar is the next blank ticket: write the title on the stub, tear at the perforation */
+.guess-field { position: relative; display: flex; }
+.guess-field:focus-within { outline: 2px solid var(--gold); outline-offset: 4px; }
+#guess-input { flex: 1; min-width: 0; -webkit-appearance: none; appearance: none; border: 0; border-radius: 0; outline: none; background: var(--paper); color: var(--ink); font: 700 19px/1.2 var(--text); font-stretch: 88%; padding: 17px 16px; }
+#guess-input::placeholder { color: var(--ink); opacity: 0.45; font-weight: 500; }
+#guess-btn { border: 0; border-left: 2px dashed var(--perf); border-radius: 0; background: var(--gold); color: var(--ink); padding: 0 26px; font-size: 16.5px; font-weight: 800; font-stretch: 88%; }
+#suggest { position: absolute; z-index: 5; top: calc(100% + 8px); left: 0; right: 0; margin: 0; padding: 0; list-style: none; background: var(--paper); color: var(--ink); max-height: 310px; overflow-y: auto; }
+#suggest li { padding: 12px 16px; cursor: pointer; font-weight: 600; font-stretch: 88%; }
+#suggest li + li { border-top: 1.5px dashed color-mix(in srgb, var(--ink) 30%, transparent); }
+#suggest li[aria-selected="true"], #suggest li:hover { background: var(--gold); }
+.msg { font-size: 15px; font-weight: 600; color: var(--gold); }
+.msg:empty { display: none; }
+.tip { font-size: 15px; color: var(--on-soft); font-variant-numeric: tabular-nums; }
+.hints { display: flex; flex-wrap: wrap; gap: 6px 22px; }
+.hint { background: none; border: 0; padding: 4px 0; color: var(--on); font-size: 15px; text-align: left; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
+.hint.open { cursor: default; text-decoration: none; font-weight: 400; }
+.hint.open b { font-weight: 700; margin-right: 6px; }
+.hint.open b::after { content: ':'; }
+.hint .shape { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; letter-spacing: 0.08em; overflow-wrap: anywhere; }
+
+/* Ticket strips. Each guess is one strip: a plain stub with the title, then eight tickets joined by perforations. */
+.board-wrap { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; min-width: 0; }
+.board { display: grid; gap: 8px; min-width: 0; }
+.row, .head { display: grid; grid-template-columns: minmax(170px, 1.8fr) repeat(8, minmax(0, 1fr)); min-width: 0; }
+.head > div { font-size: 12.5px; font-weight: 600; line-height: 1.2; color: var(--on-soft); text-align: center; padding: 0 4px 1px; }
+.head > div:first-child { text-align: left; padding-left: 14px; }
+.name, .tile, #guess-input, #guess-btn {
+  --n: 5px;
+  -webkit-mask: radial-gradient(circle var(--n) at 0 0, transparent 98%, #000), radial-gradient(circle var(--n) at 100% 0, transparent 98%, #000), radial-gradient(circle var(--n) at 0 100%, transparent 98%, #000), radial-gradient(circle var(--n) at 100% 100%, transparent 98%, #000);
+  -webkit-mask-composite: source-in;
+  mask: radial-gradient(circle var(--n) at 0 0, transparent 98%, #000), radial-gradient(circle var(--n) at 100% 0, transparent 98%, #000), radial-gradient(circle var(--n) at 0 100%, transparent 98%, #000), radial-gradient(circle var(--n) at 100% 100%, transparent 98%, #000);
+  mask-composite: intersect;
+}
+.name { display: flex; align-items: center; gap: 9px; min-width: 0; padding: 8px 12px 8px 14px; background: var(--paper); color: var(--ink); font-size: 16.5px; font-weight: 700; font-stretch: 88%; line-height: 1.15; }
+.name .no { flex: none; font-size: 12px; font-weight: 600; opacity: 0.55; font-variant-numeric: tabular-nums; }
+.name .ttl { min-width: 0; overflow-wrap: anywhere; }
+.tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 0; min-height: 64px; padding: 6px 8px; text-align: center; color: var(--ink); font-size: 13.5px; font-weight: 650; font-stretch: 78%; line-height: 1.15; overflow-wrap: anywhere; border-left: 2px dashed var(--perf); }
+.tile.ok { background: var(--ok); color: var(--paper); }
+.tile.near { background: repeating-linear-gradient(135deg, transparent 0 6px, var(--stripe) 6px 8px), var(--near); }
+/* A wrong ticket is plain stock with a hole punched in it */
+.tile.miss { background: var(--miss);
+  -webkit-mask: radial-gradient(circle var(--n) at 0 0, transparent 98%, #000), radial-gradient(circle var(--n) at 100% 0, transparent 98%, #000), radial-gradient(circle var(--n) at 0 100%, transparent 98%, #000), radial-gradient(circle var(--n) at 100% 100%, transparent 98%, #000), radial-gradient(circle 4px at calc(100% - 13px) 12px, transparent 98%, #000);
+  -webkit-mask-composite: source-in;
+  mask: radial-gradient(circle var(--n) at 0 0, transparent 98%, #000), radial-gradient(circle var(--n) at 100% 0, transparent 98%, #000), radial-gradient(circle var(--n) at 0 100%, transparent 98%, #000), radial-gradient(circle var(--n) at 100% 100%, transparent 98%, #000), radial-gradient(circle 4px at calc(100% - 13px) 12px, transparent 98%, #000);
+  mask-composite: intersect; }
+.tile .cap { display: none; font-size: 10.5px; font-weight: 600; font-stretch: 90%; opacity: 0.62; }
+.tile .val { display: grid; gap: 1px; }
+.tile .year { font-size: 21px; font-weight: 800; font-stretch: 70%; line-height: 1; font-variant-numeric: tabular-nums; }
+.tile .dir { font-size: 11.5px; font-weight: 600; font-stretch: 88%; }
+.row.fresh { animation: feed 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+@keyframes feed { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+/* The strip you are assembling: what the guesses have proved so far */
+.row.known { margin-bottom: 16px; }
+.row.known .name { -webkit-mask: none; mask: none; background: transparent; color: var(--on-soft); font-size: 13.5px; font-weight: 600; font-stretch: 100%; border: 1.5px dashed var(--on-soft); margin-right: 2px; }
+.row.known .tile { -webkit-mask: none; mask: none; min-height: 44px; margin-inline: 2px; border: 1.5px dashed var(--on-soft); background: transparent; color: var(--on); }
+.row.known .tile.k-ok { border: 0; background: var(--ok); color: var(--paper); }
+.row.known .tile.k-part { border: 0; background: repeating-linear-gradient(135deg, transparent 0 6px, var(--stripe) 6px 8px), var(--near); color: var(--ink); }
+.row.known .tile .year { font-size: 16px; }
+.board-foot { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 20px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 0; margin: 0; list-style: none; font-size: 14.5px; color: var(--on-soft); }
+.legend li { display: flex; align-items: center; gap: 7px; }
+.swatch { width: 20px; height: 14px; flex: none; }
+.swatch.ok { background: var(--ok); }
+.swatch.near { background: repeating-linear-gradient(135deg, transparent 0 3px, var(--stripe) 3px 5px), var(--near); }
+.swatch.miss { background: var(--miss); }
+.swatch.out { border: 1.5px dashed currentColor; }
+@media (max-width: 860px) {
+  .board { gap: 16px; }
+  .board .row.known { margin-bottom: 8px; }
+  .board .head { display: none; }
+  .board .row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .board .name { grid-column: 1 / -1; padding-block: 10px; }
+  .board .tile { min-height: 70px; font-size: 12.5px; border-top: 2px dashed var(--perf); }
+  .board .tile:nth-child(4n+2) { border-left: 0; }
+  .board .tile .cap { display: block; }
+  .board .tile .year { font-size: 18px; }
+  .board .row.known { gap: 4px; }
+  .board .row.known .name, .board .row.known .tile { margin: 0; border: 1.5px dashed var(--on-soft); }
+  .board .row.known .tile { min-height: 54px; }
+  .board .row.known .tile.k-ok, .board .row.known .tile.k-part { border: 0; }
+  .board .row.known .tile .year { font-size: 14px; }
+}
+
+/* The result: one big ticket with a stub */
+.end { width: min(100%, 720px); display: grid; grid-template-columns: 124px minmax(0, 1fr); --fg: var(--paper); --bg: var(--ok); color: var(--fg); background: var(--bg);
+  -webkit-mask: radial-gradient(circle 9px at 124px 0, transparent 98%, #000), radial-gradient(circle 9px at 124px 100%, transparent 98%, #000);
+  -webkit-mask-composite: source-in;
+  mask: radial-gradient(circle 9px at 124px 0, transparent 98%, #000), radial-gradient(circle 9px at 124px 100%, transparent 98%, #000);
+  mask-composite: intersect; }
+.end.lost { --fg: var(--ink); --bg: var(--miss); }
+.end-stub { display: grid; align-content: center; justify-items: center; gap: 2px; padding: 16px 8px; border-right: 2px dashed var(--perf); }
+.end-stub b { font: 400 60px/1 var(--display); font-variant-numeric: tabular-nums; }
+.end-stub span { font-size: 14px; font-weight: 600; }
+.end-body { display: grid; gap: 8px; justify-items: start; min-width: 0; padding: 20px 22px 22px; }
+.end .verdict { font-size: 15px; font-weight: 700; }
+.end .answer { font: 400 clamp(26px, 5vw, 40px)/1.06 var(--display); margin: 0; text-wrap: balance; overflow-wrap: anywhere; }
+.end .sub { font-size: 14.5px; font-variant-numeric: tabular-nums; max-width: 56ch; }
+.end .story { font-size: 16.5px; line-height: 1.4; max-width: 52ch; margin-block: 2px 4px; }
+.end .links { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-top: 4px; font-size: 15px; }
+.end .links a { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
+.end .rule { width: 100%; border-top: 1.5px dashed currentColor; opacity: 0.45; margin-block: 8px 4px; }
+.end .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.end button { border: 1.5px solid var(--fg); border-radius: 4px; background: transparent; color: var(--fg); padding: 10px 16px; font-weight: 700; }
+.end button.primary { background: var(--fg); color: var(--bg); }
+.end textarea { width: 100%; min-height: 110px; font: 14px/1.3 ui-monospace, Menlo, Consolas, monospace; background: var(--paper); color: var(--ink); border: 1.5px solid var(--ink); border-radius: 4px; padding: 8px; }
+@media (max-width: 520px) {
+  .end { grid-template-columns: 84px minmax(0, 1fr);
+    -webkit-mask: radial-gradient(circle 9px at 84px 0, transparent 98%, #000), radial-gradient(circle 9px at 84px 100%, transparent 98%, #000);
+    -webkit-mask-composite: source-in;
+    mask: radial-gradient(circle 9px at 84px 0, transparent 98%, #000), radial-gradient(circle 9px at 84px 100%, transparent 98%, #000);
+    mask-composite: intersect; }
+  .end-stub b { font-size: 44px; }
+  .end-body { padding: 16px 16px 18px; }
+}
+
+/* Help sheet: printed on plain paper */
+dialog { width: min(700px, calc(100% - 24px)); max-height: calc(100% - 24px); padding: 0; border: 0; border-radius: 8px; background: var(--paper); color: var(--ink); --perf: var(--paper); }
+dialog::backdrop { background: var(--veil); }
+.sheet { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 20px 22px 24px; }
+.sheet-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.sheet h2 { font: 400 26px/1.1 var(--display); margin: 0; }
+.sheet p { font-size: 15px; max-width: 65ch; }
+.sheet .legend { flex-direction: column; gap: 8px; font-size: 15px; color: var(--ink); }
+.board.compact .head { display: none; }
+.board.compact .row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.board.compact .name { grid-column: 1 / -1; padding-block: 10px; box-shadow: inset 0 0 0 1.5px var(--ink); -webkit-mask: none; mask: none; }
+.board.compact .tile { min-height: 70px; font-size: 12.5px; border-top: 2px dashed var(--perf); }
+.board.compact .tile:nth-child(4n+2) { border-left: 0; }
+.board.compact .tile .cap { display: block; }
+.board.compact .tile .year { font-size: 18px; }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px 24px; margin: 0; font-size: 14.5px; }
+.cols div { min-width: 0; }
+.cols dt { font-weight: 700; }
+.cols dd { margin: 0; opacity: 0.8; }
+details { border-top: 1.5px solid var(--ink); padding-top: 12px; }
+summary { cursor: pointer; font-weight: 700; }
+#repertoire { columns: 190px; column-gap: 24px; margin: 12px 0 0; padding: 0; list-style: none; font-size: 14.5px; }
+#repertoire li { break-inside: avoid; padding: 2px 0; }
+
+@media (prefers-reduced-motion: reduce) { .row.fresh, .bulbs i { animation: none; } }
